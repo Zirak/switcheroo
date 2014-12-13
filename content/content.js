@@ -18,44 +18,66 @@ function planTheSwitcheroo (tabs) {
 
     container.input.focus();
 
-    container.input.onkeyup = function input$onkeyup (e) {
-        e.preventDefault();
-
-        // TODO detect pgup, pgdown
-
-        // WHERE IS YOUR GOD NOW?
-        if (e.which === 27 /* ESC */) {
+    var barKeys = {
+        'Esc' : function () {
             container.remove();
-        }
-        else if (e.keyIdentifier === 'Enter' && selectedEl) {
+        },
+
+        'Enter' : function () {
             // Do the ol' switcheroo
-            console.log('switchng to', selectedEl.title);
+            console.log('switchng to', selectedEl.url);
 
-            port.postMessage({
-                type : 'select-tab',
-                tabId : selectedEl.tabId
-            });
+            if (selectedEl.tabId) {
+                port.postMessage({
+                    type  : 'select-tab',
+                    tabId : selectedEl.tabId
+                });
+            }
+            else if (selectedEl.url) {
+                port.postMessage({
+                    type : 'create-tab',
+                    url  : selectedEl.url
+                });
+            }
+            else {
+                console.warn('I dunno wtf to do %o', selectedEl);
+            }
             container.remove();
-        }
-        else if (e.keyIdentifier === 'Down') {
-            var next = selectedEl.nextElementSibling;
-            if (!next) {
-                next = container.tabList.firstElementChild;
-            }
-            replaceSelected(next);
-        }
-        else if (e.keyIdentifier === 'Up') {
-            var prev = selectedEl.previousElementSibling;
-            if (!prev) {
-                prev = container.tabList.lastElementChild;
-            }
+        },
+
+        'Up' : function () {
+            var prev =
+                    selectedEl.previousElementSibling ||
+                    container.tabList.lastElementChild;
             replaceSelected(prev);
-        }
-        else if (e.keyIdentifier === 'Home') {
+        },
+
+        'Down' : function () {
+            var next =
+                    selectedEl.nextElementSibling ||
+                    container.tabList.firstElementChild;
+            replaceSelected(next);
+        },
+
+        'Home' : function () {
             replaceSelected(container.tabList.firstElementChild);
-        }
-        else if (e.keyIdentifier === 'End') {
+        },
+
+        'End' : function () {
             replaceSelected(container.tabList.lastElementChild);
+        }
+    };
+
+    container.input.onkeydown = function input$onkeydown (e) {
+        var identifier = e.keyIdentifier;
+        if (e.which === 27) {
+            identifier = 'Esc';
+        }
+
+        if (barKeys.hasOwnProperty(identifier)) {
+            console.log(e, identifier);
+            e.preventDefault();
+            barKeys[identifier]();
         }
     };
 
@@ -77,6 +99,20 @@ function planTheSwitcheroo (tabs) {
         var tabList = constructTabList(filtered, selectedEl && selectedEl.tabId);
         container.appendChild(tabList);
         container.tabList = tabList;
+
+        var queryAsUrl = !query ? '' :
+                query[0] === '/' ?
+                'file://' + query :
+                    query.indexOf('://') < 0 ?
+                    'http://' + query : query;
+
+        var createTabItem = constructListItem({
+            title : 'Create New Tab',
+            url : queryAsUrl,
+            favIconUrl : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGcgaWQ9InRhYiI+PHBhdGggZD0iTTE5LDNINUMzLjksMywzLDMuOSwzLDV2MTRjMCwxLjEsMC45LDIsMiwyaDE0YzEuMSwwLDItMC45LDItMlY1QzIxLDMuOSwyMC4xLDMsMTksM3ogTTE5LDE5TDUsMTlWNWg3djRoN1YxOXoiPjwvcGF0aD48L2c+PC9zdmc+'
+        });
+        createTabItem.url = queryAsUrl;
+        tabList.appendChild(createTabItem);
 
         var selected = tabList.getElementsByClassName('switcheroo-selected')[0],
             firstChild = tabList.children[0];
@@ -130,33 +166,43 @@ function constructTabList (tabs, selectedTabId) {
     list.classList.add('switcheroo-list');
 
     tabs.map(function (tab) {
-        var item = document.createElement('li');
-        item.classList.add('switcheroo-item');
+        // <li class="switcheroo-item">
+        //   <img class="switcheroo-favicon" />
+        //   <div class="switcheroo-title">Tab title</div>
+        //   <div class="switcheroo-url">Loaded url</div>
+        // </li>
+        var item = constructListItem(tab);
         item.tabId = tab.id;
 
         if (tab.id === selectedTabId) {
             item.classList.add('switcheroo-selected');
         }
 
-        var favicon = document.createElement('img');
-        favicon.src = tab.favIconUrl;
-
-        var titleSpan = document.createElement('div');
-        titleSpan.classList.add('switcheroo-title');
-        titleSpan.textContent = tab.title;
-
-        var urlSpan = document.createElement('div');
-        urlSpan.classList.add('switcheroo-url');
-        urlSpan.textContent = tab.url;
-
-        item.appendChild(favicon);
-        item.appendChild(titleSpan);
-        item.appendChild(urlSpan);
-
         return item;
     }).forEach(list.appendChild.bind(list));
 
     return list;
+}
+function constructListItem (tab) {
+    var item = document.createElement('li');
+    item.classList.add('switcheroo-item');
+
+    var favicon = document.createElement('img');
+    favicon.src = tab.favIconUrl;
+
+    var titleSpan = document.createElement('div');
+    titleSpan.classList.add('switcheroo-title');
+    titleSpan.textContent = tab.title;
+
+    var urlSpan = document.createElement('div');
+    urlSpan.classList.add('switcheroo-url');
+    urlSpan.textContent = tab.url;
+
+    item.appendChild(favicon);
+    item.appendChild(titleSpan);
+    item.appendChild(urlSpan);
+
+    return item;
 }
 
 function filterAndSort (children, query) {
@@ -227,7 +273,9 @@ function scoreString (string, word) {
     }
 
     // Reduce penalty for longer strings.
-    finalScore = 0.5 * (runningScore / strLength + runningScore / wordLength) /fuzzies;
+    finalScore = 0.5 *
+        (runningScore / strLength + runningScore / wordLength) /
+        fuzzies;
 
     if ((lWord[0] === lString[0]) && (finalScore < 0.85)) {
         finalScore += 0.15;

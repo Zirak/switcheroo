@@ -52,6 +52,13 @@ Several reasons:
 * Highlight parts of the title/url which matched
 * Make searching Incognito tabs an option?
 * When there's a selected item and you filter on, the list scrolling follows the selected item, even if it's really far down the list. Make it fall-back to the first item?
-* Option to create tab if search looks like a url
+* --- Option to create tab if search looks like a url ---
 * Get/make/steal an icon
 * *yo mama joke*
+
+## License
+Everything *I* write is under [WTFPL](http://www.wtfpl.net/).
+
+New Tab icon by [Google](https://github.com/google/material-design-icons), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
+String scoring by [Joshaven Potter](https://github.com/joshaven/string_score), licensed under MIT.

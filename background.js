@@ -24,6 +24,11 @@ chrome.runtime.onConnect.addListener(function (port) {
         if (msg.type === 'select-tab') {
             chrome.tabs.update(msg.tabId, { active : true });
         }
+        else if (msg.type === 'create-tab') {
+            chrome.tabs.create({
+                url : msg.url
+            });
+        }
     });
 
     // TAAAAAAAAAAAAAAAAAAAAAAAAAABS

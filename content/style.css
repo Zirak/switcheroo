@@ -6,6 +6,7 @@
 {
     background: initial;
     border: initial;
+    box-sizing: initial;
     color: initial;
     cursor: initial;
     float: none;
@@ -14,9 +15,9 @@
     line-height: initial;
     margin: initial;
     padding: initial;
+    text-align: initial;
     vertical-align: initial;
     width: auto;
-    box-sizing: initial;
 }
 .switcheroo-container div { display: block; }
 .switcheroo-container img, .switcheroo-container input { display: inline; }
