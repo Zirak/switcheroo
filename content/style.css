@@ -1,0 +1,97 @@
+/* we have to un-reset most styles so the containing page won't fuck us */
+
+.switcheroo-container input,
+.switcheroo-container div,
+.switcheroo-container img
+{
+    background: initial;
+    border: initial;
+    color: initial;
+    cursor: initial;
+    float: none;
+    font-family: inherit;
+    height: auto;
+    line-height: initial;
+    margin: initial;
+    padding: initial;
+    vertical-align: initial;
+    width: auto;
+    box-sizing: initial;
+}
+.switcheroo-container div { display: block; }
+.switcheroo-container img, .switcheroo-container input { display: inline; }
+
+.switcheroo-container {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    margin: 0 auto;
+    width: 60em;
+    height: 400px;
+
+    background: #f5f5f5;
+
+    aborder-radius: 10px;
+    box-shadow: rgba(100, 100, 100, 0.3) 0px 4px 20px;
+
+    font-family: monospace;
+    font-size: initial;
+}
+
+.switcheroo-container input {
+    outline: none;
+    border: 0;
+    box-shadow: rgba(100, 100, 100, 0.3) 0px 4px 14px;
+
+    padding-left: 1rem;
+
+    height: 2rem;
+}
+
+.switcheroo-container .switcheroo-list {
+    flex: 1;
+
+    margin: 7px 0 0;
+    padding: 0;
+
+    overflow-y: auto;
+}
+
+.switcheroo-container .switcheroo-selected {
+    background : #eee;
+}
+
+.switcheroo-container .switcheroo-list .switcheroo-item {
+    border-bottom: 1px solid #eee;
+    padding: 14px;
+}
+.switcheroo-container .switcheroo-list .switcheroo-item .switcheroo-title {
+    vertical-align: middle;
+    display: inline-block;
+
+    margin-left: 4px;
+
+    width: 95%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.switcheroo-container .switcheroo-list .switcheroo-item .switcheroo-url {
+    color: #bdbdbd;
+    font-size: 0.9em;
+    padding-top: 4px;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.switcheroo-container .switcheroo-list .switcheroo-item img {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+}

@@ -1,0 +1,23 @@
+{
+    "name" : "Switcheroo",
+    "description" : "Fuzzy-navigate between open tabs",
+    "version" : "0.0.1",
+
+    "background" : {
+        "scripts" : ["background.js"],
+        "persistent" : false
+    },
+
+    "commands" : {
+        "activate" : {
+            "suggested_key" : {
+                "default"  : "Ctrl+Shift+K"
+            },
+            "description" : "Do the ol' switcheroo"
+        }
+    },
+
+    "permissions" : ["activeTab", "tabs"],
+
+    "manifest_version" : 2
+}
