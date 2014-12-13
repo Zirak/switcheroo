@@ -36,11 +36,12 @@
 
     background: #f5f5f5;
 
-    aborder-radius: 10px;
     box-shadow: rgba(100, 100, 100, 0.3) 0px 4px 20px;
 
     font-family: monospace;
     font-size: initial;
+
+    z-index: 7; /* why 7? why not? */
 }
 
 .switcheroo-container input {

@@ -57,9 +57,10 @@ function planTheSwitcheroo (tabs) {
         else if (e.keyIdentifier === 'End') {
             replaceSelected(container.tabList.lastElementChild);
         }
-        else if (e.which > 0x20) {
-            filterList(this.value);
-        }
+    };
+
+    container.input.oninput = function input$oninput () {
+        filterList(this.value);
     };
 
     function filterList (query) {
@@ -83,6 +84,9 @@ function planTheSwitcheroo (tabs) {
         // selectedEl is the element in the old tree. we need to replace it with
         //the one in the new tree we just made.
         if (selected) {
+            // TODO if the selected element is far down the list, we still keep
+            //it selected and jump to it. maybe if it's not visible in the first
+            //page, select the first? what'll be better UX?
             replaceSelected(selected);
         }
         // the selection didn't hold?
