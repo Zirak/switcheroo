@@ -1,3 +1,8 @@
+/*global chrome:false*/
+(function () {
+'use strict';
+console.log('blah');
+
 var port = chrome.runtime.connect();
 port.onMessage.addListener(function portOnMessage (msg) {
     console.log('script message', msg);
@@ -11,7 +16,7 @@ function planTheSwitcheroo (tabs) {
     console.log('tabs', tabs);
     var container = constructContainer(),
         // the entire selected mechanism is absolute shit. but idgaf.
-        selectedEl;
+        selectedEl, disruptedSelection;
 
     filterList();
     document.body.appendChild(container);
@@ -59,11 +64,17 @@ function planTheSwitcheroo (tabs) {
             replaceSelected(next);
         },
 
-        'Home' : function () {
+        'Home' : function (e) {
+            if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                return false;
+            }
             replaceSelected(container.tabList.firstElementChild);
         },
 
-        'End' : function () {
+        'End' : function (e) {
+            if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                return false;
+            }
             replaceSelected(container.tabList.lastElementChild);
         }
     };
@@ -76,8 +87,11 @@ function planTheSwitcheroo (tabs) {
 
         if (barKeys.hasOwnProperty(identifier)) {
             console.log(e, identifier);
-            e.preventDefault();
-            barKeys[identifier]();
+
+            if (barKeys[identifier](e) !== false) {
+                e.preventDefault();
+                disruptedSelection = true;
+            }
         }
     };
 
@@ -91,12 +105,16 @@ function planTheSwitcheroo (tabs) {
         if (query) {
             filtered = filterAndSort(tabs, query);
         }
+        else {
+            disruptedSelection = false;
+        }
 
         if (container.tabList) {
             container.removeChild(container.tabList);
         }
 
-        var tabList = constructTabList(filtered, selectedEl && selectedEl.tabId);
+        var selectedTabId = (disruptedSelection && selectedEl) && selectedEl.tabId,
+        tabList = constructTabList(filtered, selectedTabId);
         container.appendChild(tabList);
         container.tabList = tabList;
 
@@ -149,7 +167,7 @@ function planTheSwitcheroo (tabs) {
     }
 }
 
-function constructContainer (tabs) {
+function constructContainer () {
     var container = document.createElement('div');
     container.classList.add('switcheroo-container');
 
@@ -231,8 +249,6 @@ function filterAndSort (children, query) {
  */
 // slightly altered by Zirak, copyright and license honoured.
 function scoreString (string, word) {
-    'use strict';
-
     // If the string is equal to the word, perfect match.
     if (string === word) { return 1; }
 
@@ -283,3 +299,4 @@ function scoreString (string, word) {
 
     return finalScore;
 }
+})();

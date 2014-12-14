@@ -1,25 +1,32 @@
+/*global chrome:false*/
+
 // keyboard activation
-chrome.commands.onCommand.addListener(function (command) {
+chrome.commands.onCommand.addListener(function commands$onCommand (command) {
     console.log('got command', command);
+
     if (command === 'activate') {
-        chrome.tabs.insertCSS({ file : 'content/style.css' });
-        chrome.tabs.executeScript({ file : 'content/content.js' });
+        chrome.tabs.insertCSS({ file : 'src/content/style.css' });
+        chrome.tabs.executeScript({ file : 'src/content/content.js' });
     }
 });
 
-chrome.runtime.onConnect.addListener(function (port) {
+chrome.runtime.onConnect.addListener(function runtime$onConnect (port) {
     console.log(port);
 
-    chrome.tabs.query({}, function (tabs) {
+    chrome.tabs.query({}, function postTabsToPort (tabs) {
+        var nonIncognitoTabs = tabs.filter(function filterIncognitoTabs (tab) {
+            return !tab.incognito;
+        });
+
         port.postMessage({
             type : 'tabs',
-            tabs : tabs.filter(function (tab) { return !tab.incognito; })
+            tabs : nonIncognitoTabs
             // taaaaabs
         });
         // TAAAAAAAAAAAAAABS
     });
 
-    port.onMessage.addListener(function (msg) {
+    port.onMessage.addListener(function port$onMessage (msg) {
         console.log('got message', msg);
         if (msg.type === 'select-tab') {
             chrome.tabs.update(msg.tabId, { active : true });

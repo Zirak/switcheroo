@@ -2,7 +2,9 @@
 
 .switcheroo-container input,
 .switcheroo-container div,
-.switcheroo-container img
+.switcheroo-container img,
+.switcheroo-container ul,
+.switcheroo-container li,
 {
     background: initial;
     border: initial;
