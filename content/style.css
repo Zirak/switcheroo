@@ -42,7 +42,7 @@
     font-family: monospace;
     font-size: initial;
 
-    z-index: 7; /* why 7? why not? */
+    z-index: 99999;
 }
 
 .switcheroo-container input {
@@ -96,4 +96,8 @@
     width: 1em;
     height: 1em;
     vertical-align: middle;
+}
+
+.switcheroo-container .switcheroo-list .switcheroo-item .switcheroo-highlight {
+	background-color: #FF0;	
 }

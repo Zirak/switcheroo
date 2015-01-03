@@ -95,8 +95,8 @@ function planTheSwitcheroo (tabs) {
         if (container.tabList) {
             container.removeChild(container.tabList);
         }
-
-        var tabList = constructTabList(filtered, selectedEl && selectedEl.tabId);
+		
+		var tabList = constructTabList(filtered, selectedEl && selectedEl.tabId, query);
         container.appendChild(tabList);
         container.tabList = tabList;
 
@@ -161,7 +161,7 @@ function constructContainer (tabs) {
     return container;
 }
 
-function constructTabList (tabs, selectedTabId) {
+function constructTabList (tabs, selectedTabId, query) {
     var list = document.createElement('ul');
     list.classList.add('switcheroo-list');
 
@@ -171,7 +171,7 @@ function constructTabList (tabs, selectedTabId) {
         //   <div class="switcheroo-title">Tab title</div>
         //   <div class="switcheroo-url">Loaded url</div>
         // </li>
-        var item = constructListItem(tab);
+        var item = constructListItem(tab, query);
         item.tabId = tab.id;
 
         if (tab.id === selectedTabId) {
@@ -183,20 +183,22 @@ function constructTabList (tabs, selectedTabId) {
 
     return list;
 }
-function constructListItem (tab) {
+function constructListItem (tab, query) {
     var item = document.createElement('li');
     item.classList.add('switcheroo-item');
 
     var favicon = document.createElement('img');
     favicon.src = tab.favIconUrl;
-
+			
+	
     var titleSpan = document.createElement('div');
     titleSpan.classList.add('switcheroo-title');
-    titleSpan.textContent = tab.title;
-
+	titleSpan.innerHTML = !query ? tab.title : highlightText(tab.title, query);
+	
+	
     var urlSpan = document.createElement('div');
     urlSpan.classList.add('switcheroo-url');
-    urlSpan.textContent = tab.url;
+	urlSpan.innerHTML = !query ? tab.url : highlightText(tab.url, query);
 
     item.appendChild(favicon);
     item.appendChild(titleSpan);
@@ -217,6 +219,13 @@ function filterAndSort (children, query) {
     }).sort(function (left, right) {
         return right.score - left.score;
     });
+}
+
+// Highlight parts of the string which match the query
+function highlightText (string, query) {
+	var escapedQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+	var regEx = new RegExp( '(' + escapedQuery + ')', 'gi' );
+	return string.replace( regEx, '<span class="switcheroo-highlight">$1</span>');
 }
 
 /*!
