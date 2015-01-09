@@ -30,6 +30,10 @@ chrome.runtime.onConnect.addListener(function runtime$onConnect (port) {
         console.log('got message', msg);
         if (msg.type === 'select-tab') {
             chrome.tabs.update(msg.tabId, { active : true });
+
+            chrome.tabs.get(msg.tabId, function (tab) {
+                chrome.windows.update(tab.windowId, { focused : true });
+            });
         }
         else if (msg.type === 'create-tab') {
             chrome.tabs.create({
