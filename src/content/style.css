@@ -44,7 +44,10 @@
     font-family: monospace;
     font-size: initial;
 
-    z-index: 7; /* why 7? why not? */
+    /* this comment initially asked "why 7". #1 pointed out that "why not" is
+    not a sufficiently good answer. so when the container is injected into page
+    we automagically figure out the highest z-index. */
+    z-index: 7;
 }
 
 .switcheroo-container input {

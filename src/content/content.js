@@ -183,7 +183,22 @@ function constructContainer () {
     container.input = input;
     container.appendChild(input);
 
+    // position it juuuuusstttt above anything else
+    container.style.zIndex = largestZIndex() + 7;
+    // why 7? why not?
+
     return container;
+
+    // this is horrible
+    function largestZIndex () {
+        var allElements = document.body.getElementsByTagName('*');
+
+        var zIndices = [].map.call(allElements, function (el) {
+            return Number(window.getComputedStyle(el).zIndex);
+        }).filter(Boolean);
+
+        return Math.max.apply(null, zIndices);
+    }
 }
 
 function constructTabList (tabs, selectedTabId) {
