@@ -1,10 +1,16 @@
 /*global chrome:false*/
 (function () {
 'use strict';
-console.log('blah');
+
+var switcherooInPlace =
+        document.getElementsByClassName('switcheroo-container').length;
+if (switcherooInPlace) {
+    return;
+}
 
 var port = chrome.runtime.connect();
-port.onMessage.addListener(function portOnMessage (msg) {
+
+port.onMessage.addListener(function port$onMessage (msg) {
     console.log('script message', msg);
 
     if (msg.type === 'tabs' && msg.tabs) {
@@ -30,7 +36,7 @@ function planTheSwitcheroo (tabs) {
 
         'Enter' : function () {
             // Do the ol' switcheroo
-            console.log('switchng to', selectedEl.url);
+            console.log('switching to', selectedEl.url);
 
             if (selectedEl.tabId) {
                 port.postMessage({
@@ -47,6 +53,7 @@ function planTheSwitcheroo (tabs) {
             else {
                 console.warn('I dunno wtf to do %o', selectedEl);
             }
+
             container.remove();
         },
 
