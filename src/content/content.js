@@ -86,6 +86,12 @@ function planTheSwitcheroo (tabs) {
         }
     };
 
+    document.addEventListener('click', function document$click(e) {
+        if (!container.contains(e.target)) {
+            container.remove();
+        }
+    });
+
     container.input.onkeydown = function input$onkeydown (e) {
         var identifier = e.keyIdentifier;
         if (e.which === 27) {

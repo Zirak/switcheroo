@@ -1,7 +1,7 @@
 {
     "name" : "Switcheroo",
     "description" : "Fuzzy-navigate between open tabs",
-    "version" : "0.0.1",
+    "version" : "0.0.2",
 
     "background" : {
         "scripts" : ["src/background.js"],
