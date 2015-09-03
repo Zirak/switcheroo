@@ -45,4 +45,4 @@ chrome.runtime.onConnect.addListener(function runtime$onConnect (port) {
     // TAAAAAAAAAAAAAAAAAAAAAAAAAABS
 });
 
-//console.log('yeepee');
+console.log('yeepee');
