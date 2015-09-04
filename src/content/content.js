@@ -24,14 +24,28 @@ function planTheSwitcheroo (tabs) {
         // the entire selected mechanism is absolute shit. but idgaf.
         selectedEl, disruptedSelection;
 
-    filterList();
-    document.body.appendChild(container);
+    var exposedContainer = document.createElement('div'),
+        shadowedContainer = exposedContainer.createShadowRoot();
 
-    container.input.focus();
+    exposedContainer.classList.add('switcheroo-container');
+
+    filterList();
+    document.body.appendChild(exposedContainer);
+    // this is all inside our shadow world now
+
+    createStyleElement().then(function (style) {
+        shadowedContainer.appendChild(style);
+        // the following MUST happen after the shadow dom contains our style
+        // else we'd face a reflow, and worse, can cause autoscrolling of
+        // the page twice
+        shadowedContainer.appendChild(container);
+        container.input.focus();
+    });
+
 
     var barKeys = {
         'Esc' : function () {
-            container.remove();
+            exposedContainer.remove();
         },
 
         'Enter' : function () {
@@ -54,7 +68,7 @@ function planTheSwitcheroo (tabs) {
                 console.warn('I dunno wtf to do %o', selectedEl);
             }
 
-            container.remove();
+            exposedContainer.remove();
         },
 
         'Up' : function () {
@@ -88,7 +102,7 @@ function planTheSwitcheroo (tabs) {
 
     document.addEventListener('click', function document$click(e) {
         if (!container.contains(e.target)) {
-            container.remove();
+            exposedContainer.remove();
         }
     });
 
@@ -262,6 +276,22 @@ function filterAndSort (children, query) {
         return child.score > 0;
     }).sort(function (left, right) {
         return right.score - left.score;
+    });
+}
+
+function createStyleElement () {
+    // our style is located in src/content/style.css
+    return new Promise(function fetch (resolve, reject) { // native fetch doesn't support chrome-extension:// protocol
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', chrome.extension.getURL('src/content/style.css'));
+        xhr.send();
+        xhr.addEventListener('load', function () {
+            var style = document.createElement('style');
+            style.textContent = xhr.responseText;
+            style.type = 'text/css';
+            resolve(style);
+        });
+        xhr.addEventListener('error', reject);
     });
 }
 
