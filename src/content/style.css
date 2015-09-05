@@ -1,10 +1,10 @@
 /* we have to un-reset most styles so the containing page won't fuck us */
 
-.switcheroo-container input,
-.switcheroo-container div,
-.switcheroo-container img,
-.switcheroo-container ul,
-.switcheroo-container li
+input,
+div,
+img,
+ul,
+li
 {
     background: initial;
     border: initial;
@@ -21,8 +21,8 @@
     vertical-align: initial;
     width: auto;
 }
-.switcheroo-container div { display: block; }
-.switcheroo-container img, .switcheroo-container input { display: inline; }
+div { display: block; }
+img, input { display: inline; }
 
 .switcheroo-container {
     position: fixed;
@@ -50,7 +50,7 @@
     z-index: 7;
 }
 
-.switcheroo-container input {
+input {
     outline: none;
     border: 0;
     box-shadow: rgba(100, 100, 100, 0.3) 0px 4px 14px;
@@ -60,7 +60,7 @@
     height: 2rem;
 }
 
-.switcheroo-container .switcheroo-list {
+.switcheroo-list {
     flex: 1;
 
     margin: 7px 0 0;
@@ -69,15 +69,15 @@
     overflow-y: auto;
 }
 
-.switcheroo-container .switcheroo-selected {
+.switcheroo-selected {
     background : #eee;
 }
 
-.switcheroo-container .switcheroo-list .switcheroo-item {
+.switcheroo-list .switcheroo-item {
     border-bottom: 1px solid #eee;
     padding: 14px;
 }
-.switcheroo-container .switcheroo-list .switcheroo-item .switcheroo-title {
+.switcheroo-list .switcheroo-item .switcheroo-title {
     vertical-align: middle;
     display: inline-block;
 
@@ -88,7 +88,7 @@
     overflow: hidden;
     white-space: nowrap;
 }
-.switcheroo-container .switcheroo-list .switcheroo-item .switcheroo-url {
+.switcheroo-list .switcheroo-item .switcheroo-url {
     color: #bdbdbd;
     font-size: 0.9em;
     padding-top: 4px;
@@ -97,7 +97,7 @@
     overflow: hidden;
     white-space: nowrap;
 }
-.switcheroo-container .switcheroo-list .switcheroo-item img {
+.switcheroo-list .switcheroo-item img {
     width: 1em;
     height: 1em;
     vertical-align: middle;
