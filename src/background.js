@@ -5,8 +5,8 @@ chrome.commands.onCommand.addListener(function commands$onCommand (command) {
     console.log('got command', command);
 
     if (command === 'activate') {
-        chrome.tabs.insertCSS({ file : 'src/content/style.css' });
         chrome.tabs.executeScript({ file : 'src/content/content.js' });
+        // css insertion is done dynamically now in content.js inside shadowed container
     }
 });
 
