@@ -101,7 +101,7 @@ function planTheSwitcheroo (tabs) {
     };
 
     document.addEventListener('click', function document$click(e) {
-        if (!container.contains(e.target)) {
+        if (e.target !== exposedContainer) {
             exposedContainer.remove();
         }
     });
