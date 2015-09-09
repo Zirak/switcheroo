@@ -2,7 +2,7 @@
 
 A Chrome extension for fuzzy-finding and switching between tabs.
 
-![switcheroo](http://i.imgur.com/vsB6ytH.png)
+![switcheroo](https://cloud.githubusercontent.com/assets/1144615/9701333/642009e2-5413-11e5-81a2-76f817e1fd42.png)
 
 ## Installing
 
