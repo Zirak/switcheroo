@@ -13,7 +13,7 @@ function planTheSwitcheroo (tabs) {
         // the entire selected mechanism is absolute shit. but idgaf.
         selectedEl, disruptedSelection;
 
-    container.classList.add('switcheroo-container');
+    container.classList.add('container');
 
     filterList();
     document.body.appendChild(container);
@@ -97,7 +97,7 @@ function planTheSwitcheroo (tabs) {
             container.appendChild(tabList);
             container.tabList = tabList;
 
-        var queryAsUrl = !query ? '' :
+        var queryAsUrl = !query ? 'chrome://newtab' :
                 query[0] === '/' ?
                 'file://' + query :
                     query.indexOf('://') < 0 ?
@@ -106,12 +106,12 @@ function planTheSwitcheroo (tabs) {
         var createTabItem = constructListItem({
             title: 'Create New Tab',
             url: queryAsUrl,
-            favIconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGcgaWQ9InRhYiI+PHBhdGggZD0iTTE5LDNINUMzLjksMywzLDMuOSwzLDV2MTRjMCwxLjEsMC45LDIsMiwyaDE0YzEuMSwwLDItMC45LDItMlY1QzIxLDMuOSwyMC4xLDMsMTksM3ogTTE5LDE5TDUsMTlWNWg3djRoN1YxOXoiPjwvcGF0aD48L2c+PC9zdmc+'
+            favIconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDNINUMzLjksMywzLDMuOSwzLDV2MTRjMCwxLjEsMC45LDIsMiwyaDE0YzEuMSwwLDItMC45LDItMlY1QzIxLDMuOSwyMC4xLDMsMTksM3oiIGZpbGw9IiNjY2MiLz4KPHBhdGggZD0iTTE5LDE5TDUsMTlWNWg3djRoN1YxOXoiIGZpbGw9IiMyMDIwMjAiLz48L3N2Zz4='
         });
         createTabItem.url = queryAsUrl;
         tabList.appendChild(createTabItem);
 
-        var selected = tabList.getElementsByClassName('switcheroo-selected')[0],
+        var selected = tabList.getElementsByClassName('selected')[0],
             firstChild = tabList.children[0];
 
         // selectedEl is the element in the old tree. we need to replace it with
@@ -124,7 +124,7 @@ function planTheSwitcheroo (tabs) {
         }
         // the selection didn't hold?
         else if (!selected && firstChild) {
-            firstChild.classList.add('switcheroo-selected');
+            firstChild.classList.add('selected');
             replaceSelected(firstChild);
         }
         else if (!firstChild) {
@@ -137,10 +137,10 @@ function planTheSwitcheroo (tabs) {
     function replaceSelected (newSelected) {
         console.log('replaceSelected', selectedEl, newSelected);
         if (selectedEl) {
-            selectedEl.classList.remove('switcheroo-selected');
+            selectedEl.classList.remove('selected');
         }
         selectedEl = newSelected;
-        selectedEl.classList.add('switcheroo-selected');
+        selectedEl.classList.add('selected');
 
         selectedEl.scrollIntoViewIfNeeded(false);
     }
@@ -148,7 +148,7 @@ function planTheSwitcheroo (tabs) {
 
 function constructContainer () {
     var container = document.createElement('div');
-    container.classList.add('switcheroo-container');
+    container.classList.add('container');
 
     var input = document.createElement('input');
     input.autofocus = true;
@@ -161,19 +161,19 @@ function constructContainer () {
 
 function constructTabList (tabs, selectedTabId) {
     var list = document.createElement('ul');
-    list.classList.add('switcheroo-list');
+    list.classList.add('list');
 
     tabs.map(tab => {
-        // <li class="switcheroo-item">
-        //   <img class="switcheroo-favicon" />
-        //   <div class="switcheroo-title">Tab title</div>
-        //   <div class="switcheroo-url">Loaded url</div>
+        // <li class="item">
+        //   <img class="favicon" />
+        //   <div class="title">Tab title</div>
+        //   <div class="url">Loaded url</div>
         // </li>
         var item = constructListItem(tab);
         item.tabId = tab.id;
 
         if (tab.id === selectedTabId) {
-            item.classList.add('switcheroo-selected');
+            item.classList.add('selected');
         }
 
         return item;
@@ -183,17 +183,17 @@ function constructTabList (tabs, selectedTabId) {
 }
 function constructListItem (tab) {
     var item = document.createElement('li');
-    item.classList.add('switcheroo-item');
+    item.classList.add('item');
 
     var favicon = document.createElement('img');
     favicon.src = tab.favIconUrl;
 
     var titleSpan = document.createElement('div');
-    titleSpan.classList.add('switcheroo-title');
+    titleSpan.classList.add('title');
     titleSpan.textContent = tab.title;
 
     var urlSpan = document.createElement('div');
-    urlSpan.classList.add('switcheroo-url');
+    urlSpan.classList.add('url');
     urlSpan.textContent = tab.url;
 
     item.appendChild(favicon);
