@@ -27,7 +27,7 @@ It's not bound there by default because extensions cannot bind to already bound 
 
 Navigate to any page, hit the shortcut (default Ctrl+Shift+K, you should really change it), and start typing! The tab url and tab title are searched.
 
-Hit Enter to navigate, Up/Down/Home/End to select from the list. Esc to quit.
+Hit Enter to navigate, Up/Down/Home/End to select from the list. Esc, the shortcut, or click anywhere outside, to quit.
 
 Note that Switcheroo will *not* search incognito tabs. This is by design.
 

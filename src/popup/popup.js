@@ -1,21 +1,10 @@
 /*global chrome:false*/
-(function () {
+
 'use strict';
 
-var switcherooInPlace =
-        document.getElementsByClassName('switcheroo-container').length;
-if (switcherooInPlace) {
-    return;
-}
-
-var port = chrome.runtime.connect();
-
-port.onMessage.addListener(function port$onMessage (msg) {
-    console.log('script message', msg);
-
-    if (msg.type === 'tabs' && msg.tabs) {
-        planTheSwitcheroo(msg.tabs);
-    }
+chrome.tabs.query({}, tabs => {
+    var nonIncognitoTabs = tabs.filter(tab => !tab.incognito);
+    planTheSwitcheroo(nonIncognitoTabs);
 });
 
 function planTheSwitcheroo (tabs) {
@@ -24,87 +13,50 @@ function planTheSwitcheroo (tabs) {
         // the entire selected mechanism is absolute shit. but idgaf.
         selectedEl, disruptedSelection;
 
-    var exposedContainer = document.createElement('div'),
-        shadowedContainer = exposedContainer.createShadowRoot();
-
-    exposedContainer.classList.add('switcheroo-container');
+    container.classList.add('switcheroo-container');
 
     filterList();
-    document.body.appendChild(exposedContainer);
-    // this is all inside our shadow world now
-
-    createStyleElement().then(function (style) {
-        shadowedContainer.appendChild(style);
-        // the following MUST happen after the shadow dom contains our style
-        // else we'd face a reflow, and worse, can cause autoscrolling of
-        // the page twice
-        shadowedContainer.appendChild(container);
-        container.input.focus();
-    });
-
+    document.body.appendChild(container);
 
     var barKeys = {
-        'Esc' : function () {
-            exposedContainer.remove();
+        'Esc': function () {
+            goodbye();
         },
 
-        'Enter' : function () {
+        'Enter': function () {
             // Do the ol' switcheroo
-            console.log('switching to', selectedEl.url);
-
-            if (selectedEl.tabId) {
-                port.postMessage({
-                    type  : 'select-tab',
-                    tabId : selectedEl.tabId
-                });
-            }
-            else if (selectedEl.url) {
-                port.postMessage({
-                    type : 'create-tab',
-                    url  : selectedEl.url
-                });
-            }
-            else {
-                console.warn('I dunno wtf to do %o', selectedEl);
-            }
-
-            exposedContainer.remove();
+            console.log('switching to', selectedEl);
+            openSelection(selectedEl).then(goodbye);
         },
 
-        'Up' : function () {
+        'Up': function () {
             var prev =
                     selectedEl.previousElementSibling ||
                     container.tabList.lastElementChild;
             replaceSelected(prev);
         },
 
-        'Down' : function () {
+        'Down': function () {
             var next =
                     selectedEl.nextElementSibling ||
                     container.tabList.firstElementChild;
             replaceSelected(next);
         },
 
-        'Home' : function (e) {
+        'Home': function (e) {
             if (e.shiftKey || e.ctrlKey || e.metaKey) {
                 return false;
             }
             replaceSelected(container.tabList.firstElementChild);
         },
 
-        'End' : function (e) {
+        'End': function (e) {
             if (e.shiftKey || e.ctrlKey || e.metaKey) {
                 return false;
             }
             replaceSelected(container.tabList.lastElementChild);
         }
     };
-
-    document.addEventListener('click', function document$click(e) {
-        if (e.target !== exposedContainer) {
-            exposedContainer.remove();
-        }
-    });
 
     container.input.onkeydown = function input$onkeydown (e) {
         var identifier = e.keyIdentifier;
@@ -141,9 +93,9 @@ function planTheSwitcheroo (tabs) {
         }
 
         var selectedTabId = (disruptedSelection && selectedEl) && selectedEl.tabId,
-        tabList = constructTabList(filtered, selectedTabId);
-        container.appendChild(tabList);
-        container.tabList = tabList;
+            tabList = constructTabList(filtered, selectedTabId);
+            container.appendChild(tabList);
+            container.tabList = tabList;
 
         var queryAsUrl = !query ? '' :
                 query[0] === '/' ?
@@ -152,9 +104,9 @@ function planTheSwitcheroo (tabs) {
                     'http://' + query : query;
 
         var createTabItem = constructListItem({
-            title : 'Create New Tab',
-            url : queryAsUrl,
-            favIconUrl : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGcgaWQ9InRhYiI+PHBhdGggZD0iTTE5LDNINUMzLjksMywzLDMuOSwzLDV2MTRjMCwxLjEsMC45LDIsMiwyaDE0YzEuMSwwLDItMC45LDItMlY1QzIxLDMuOSwyMC4xLDMsMTksM3ogTTE5LDE5TDUsMTlWNWg3djRoN1YxOXoiPjwvcGF0aD48L2c+PC9zdmc+'
+            title: 'Create New Tab',
+            url: queryAsUrl,
+            favIconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGcgaWQ9InRhYiI+PHBhdGggZD0iTTE5LDNINUMzLjksMywzLDMuOSwzLDV2MTRjMCwxLjEsMC45LDIsMiwyaDE0YzEuMSwwLDItMC45LDItMlY1QzIxLDMuOSwyMC4xLDMsMTksM3ogTTE5LDE5TDUsMTlWNWg3djRoN1YxOXoiPjwvcGF0aD48L2c+PC9zdmc+'
         });
         createTabItem.url = queryAsUrl;
         tabList.appendChild(createTabItem);
@@ -199,33 +151,19 @@ function constructContainer () {
     container.classList.add('switcheroo-container');
 
     var input = document.createElement('input');
+    input.autofocus = true;
 
     container.input = input;
     container.appendChild(input);
 
-    // position it juuuuusstttt above anything else
-    container.style.zIndex = largestZIndex() + 7;
-    // why 7? why not?
-
     return container;
-
-    // this is horrible
-    function largestZIndex () {
-        var allElements = document.body.getElementsByTagName('*');
-
-        var zIndices = [].map.call(allElements, function (el) {
-            return Number(window.getComputedStyle(el).zIndex);
-        }).filter(Boolean);
-
-        return Math.max.apply(null, zIndices);
-    }
 }
 
 function constructTabList (tabs, selectedTabId) {
     var list = document.createElement('ul');
     list.classList.add('switcheroo-list');
 
-    tabs.map(function (tab) {
+    tabs.map(tab => {
         // <li class="switcheroo-item">
         //   <img class="switcheroo-favicon" />
         //   <div class="switcheroo-title">Tab title</div>
@@ -266,33 +204,57 @@ function constructListItem (tab) {
 }
 
 function filterAndSort (children, query) {
-    return children.map(function (child) {
+    return children.map(child => {
         child.score =
             scoreString(child.title, query) +
             scoreString(child.url, query);
 
         return child;
-    }).filter(function (child) {
-        return child.score > 0;
-    }).sort(function (left, right) {
-        return right.score - left.score;
-    });
+    })
+    .filter(child => child.score > 0)
+    .sort((left, right) => right.score - left.score);
 }
 
-function createStyleElement () {
-    // our style is located in src/content/style.css
-    return new Promise(function fetch (resolve, reject) { // native fetch doesn't support chrome-extension:// protocol
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', chrome.extension.getURL('src/content/style.css'));
-        xhr.send();
-        xhr.addEventListener('load', function () {
-            var style = document.createElement('style');
-            style.textContent = xhr.responseText;
-            style.type = 'text/css';
-            resolve(style);
+function openSelection (selected) {
+    if (selected.tabId) {
+        let updateTab = stupidChromiePromisify(chrome.tabs.update),
+            getTab = stupidChromiePromisify(chrome.tabs.get),
+            updateWindow = stupidChromiePromisify(chrome.windows.update);
+
+        return Promise.all([
+            updateTab(selected.tabId, { active: true }),
+
+            getTab(selected.tabId).then(tab =>
+                updateWindow(tab.windowId, { focused: true })
+            )
+        ]);
+    }
+    else if (selected.url) {
+        let createTab = stupidChromiePromisify(chrome.tabs.create);
+
+        return createTab({ url: selected.url });
+    }
+    else {
+        // meh
+        console.error('I dunno wtf to do', selected);
+        return Promise.reject(new TypeError('Invalid selected tab'));
+    }
+}
+
+function goodbye() {
+    console.log('bye bye!');
+    window.close();
+}
+
+function stupidChromiePromisify(fun) {
+    return function () {
+        var args = Array.from(arguments);
+
+        return new Promise(resolve => {
+            args.push(resolve);
+            fun.apply(this, args);
         });
-        xhr.addEventListener('error', reject);
-    });
+    };
 }
 
 /*!
@@ -357,4 +319,3 @@ function scoreString (string, word) {
 
     return finalScore;
 }
-})();
