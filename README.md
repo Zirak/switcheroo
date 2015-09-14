@@ -65,4 +65,4 @@ Icon by [Freepik](http://www.freepik.com) from [Flaticon](http://www.flaticon.co
 
 New Tab icon by [Google](https://github.com/google/material-design-icons), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/), slightly altered by Zirak (me).
 
-String scoring by [Joshaven Potter](https://github.com/joshaven/string_score), licensed under MIT.
+String scoring by [Ben Ripkens](https://github.com/bripkens/fuzzy.js), licensed under MIT, altered by Zirak.

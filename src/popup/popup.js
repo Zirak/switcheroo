@@ -205,9 +205,10 @@ function constructListItem (tab) {
 
 function filterAndSort (children, query) {
     return children.map(child => {
-        child.score =
-            scoreString(child.title, query) +
-            scoreString(child.url, query);
+        child.titleFuzz = fuzzyMatch(child.title, query);
+        child.urlFuzz = fuzzyMatch(child.url, query);
+
+        child.score = child.titleFuzz.score + child.urlFuzz.score;
 
         return child;
     })
@@ -257,65 +258,67 @@ function stupidChromiePromisify(fun) {
     };
 }
 
-/*!
- * string_score.js: String Scoring Algorithm 0.1.21
- *
- * http://joshaven.com/string_score
- * https://github.com/joshaven/string_score
- *
- * Copyright (C) 2009-2014 Joshaven Potter <yourtech@gmail.com>
- * Special thanks to all of the contributors listed here https://github.com/joshaven/string_score
- * MIT License: http://opensource.org/licenses/MIT
- */
-// slightly altered by Zirak, copyright and license honoured.
-function scoreString (string, word) {
-    // If the string is equal to the word, perfect match.
-    if (string === word) { return 1; }
+/*
+   fuzzy.js v0.0.2
+   (c) 2013 Ben Ripkens
+   License: MIT
+  */
+  // slightly altered by Zirak, copyright and license honoured.
+  var fuzzyMatch = (function (context) {
+      'use strict';
 
-    //if it's not a perfect match and is empty return 0
-    if (word === '') { return 0; }
+      var fuzzy = function fuzzy(term, query) {
+          var max = calcFuzzyScore(term, query);
+          var termLength = term.length;
 
-    var runningScore = 0,
-        charScore,
-        finalScore,
-        lString = string.toLowerCase(),
-        strLength = string.length,
-        lWord = word.toLowerCase(),
-        wordLength = word.length,
-        idxOf,
-        startAt = 0,
-        fuzzies = 1;
+          for (var i = 1; i < termLength && i < fuzzy.analyzeSubTermDepth; i++) {
+              let subTerm = term.substring(i);
+              let score = calcFuzzyScore(subTerm, query);
+              if (score.score > max.score) {
+                  score.term = term;
+                  score.matches = max.matches.concat(score.matches)
+                  max = score;
+              }
+          }
 
-    for (var i = 0; i < wordLength; ++i) {
-        idxOf = lString.indexOf(lWord[i], startAt);
-        if (-1 === idxOf) {
-            return 0;
-        }
-        else if (startAt === idxOf) {
-            charScore = 0.7;
-        }
-        else {
-            charScore = 0.1;
-            if (string[idxOf - 1] === ' ') {
-                charScore += 0.8;
-            }
-        }
+          return max;
+      };
 
-        if (string[idxOf] === word[i]) {
-            charScore += 0.1;
-        }
-        runningScore += charScore;
-        startAt = idxOf + 1;
-    }
+      var calcFuzzyScore = function calcFuzzyScore(term, query) {
+          var score = 0;
+          var termLength = term.length;
+          var queryLength = query.length;
+          var ti = 0;
+          var previousMatchingCharacter = -2;
 
-    // Reduce penalty for longer strings.
-    finalScore = 0.5 *
-        (runningScore / strLength + runningScore / wordLength) /
-        fuzzies;
+          var matches = [];
 
-    if ((lWord[0] === lString[0]) && (finalScore < 0.85)) {
-        finalScore += 0.15;
-    }
+          for (var qi = 0; qi < queryLength && ti < termLength; qi++) {
+              let qc = query.charAt(qi);
+              let lowerQc = qc.toLowerCase();
 
-    return finalScore;
-}
+              for (; ti < termLength; ti++) {
+                  let tc = term.charAt(ti);
+
+                  if (lowerQc === tc.toLowerCase()) {
+                      score++;
+
+                      if ((previousMatchingCharacter + 1) === ti) {
+                          score += 2;
+                      }
+
+                      previousMatchingCharacter = ti;
+                      matches.push(ti);
+                      ti++;
+                      break;
+                  }
+              }
+          }
+
+          return { score, term, query, matches };
+      };
+
+      fuzzy.analyzeSubTermDepth = 10;
+
+      return fuzzy;
+  })(this);
