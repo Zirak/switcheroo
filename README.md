@@ -49,18 +49,20 @@ Several reasons:
 * I cbf right now.
 
 ## TODOs
-* Sort tabs by activity
+* Sort tabs by activity (MRU)
+* Bookmarks, history, ...
 * Add PgUp/PgDown navigation
 * Highlight parts of the title/url which matched
 * Make searching Incognito tabs an option?
 * When there's a selected item and you filter on, the list scrolling follows the selected item, even if it's really far down the list. Make it fall-back to the first item?
-* --- Option to create tab if search looks like a url ---
 * Get/make/steal an icon
 * *yo mama joke*
 
 ## License
 Everything *I* write is under [WTFPL](http://www.wtfpl.net/).
 
-New Tab icon by [Google](https://github.com/google/material-design-icons), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+Icon by [Freepik](http://www.freepik.com) from [Flaticon](http://www.flaticon.com), licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/).
+
+New Tab icon by [Google](https://github.com/google/material-design-icons), licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/), slightly altered by Zirak (me).
 
 String scoring by [Joshaven Potter](https://github.com/joshaven/string_score), licensed under MIT.
