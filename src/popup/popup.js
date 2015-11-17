@@ -3,8 +3,8 @@
 'use strict';
 
 chrome.tabs.query({}, tabs => {
-    var nonIncognitoTabs = tabs.filter(tab => !tab.incognito);
-    planTheSwitcheroo(nonIncognitoTabs);
+    var visibleTabs = tabs.filter(tab => tab.incognito === chrome.extension.inIncognitoContext);
+    planTheSwitcheroo(visibleTabs);
 });
 
 function planTheSwitcheroo (tabs) {

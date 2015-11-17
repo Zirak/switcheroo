@@ -29,7 +29,7 @@ Navigate to any page, hit the shortcut (default Ctrl+Shift+K, you should really 
 
 Hit Enter to navigate, Up/Down/Home/End to select from the list. Esc, the shortcut, or click anywhere outside, to quit.
 
-Note that Switcheroo will *not* search incognito tabs. This is by design.
+When in Incognito mode and enabled, Switcheroo will only search Incognito tabs and vice-versa.
 
 ## Why?
 

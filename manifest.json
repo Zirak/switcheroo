@@ -30,5 +30,7 @@
         "48": "icons/icon48.png"
     },
 
+    "incognito": "split",
+
     "manifest_version" : 2
 }
